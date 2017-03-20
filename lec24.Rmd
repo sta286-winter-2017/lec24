@@ -1,0 +1,177 @@
+---
+title: "STA286 Lecture 24"
+author: "Neil Montgomery"
+date: "Last edited: `r format(Sys.time(), '%Y-%m-%d %H:%M')`"
+output: 
+  beamer_presentation:
+    keep_tex: TRUE
+    incremental: TRUE
+    df_print: tibble
+    fig_caption: FALSE
+classoption: aspectratio=169
+header-includes:
+- \renewcommand{\le}{\leqslant}
+- \renewcommand{\ge}{\geqslant}
+- \renewcommand\P[1]{P{\left(#1\right)}}
+- \newcommand\F[1]{F_{\tiny{#1}}}
+- \newcommand\f[1]{f_{\tiny{#1}}}
+- \newcommand\p[1]{p_{\tiny{#1}}}
+- \newcommand\M[1]{M_{\tiny{#1}}}
+- \newcommand\V[1]{\text{Var}\!\left(#1\right)}
+- \newcommand\E[1]{E\!\left(#1\right)}
+- \newcommand\N[1]{N_{\tiny{#1}}}
+- \newcommand\ol{\overline}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE,
+                      dev = 'pdf')
+options(tibble.width=70)
+```
+
+
+# interval estimation
+
+## estimation, with an assessment of the data collection plan
+
+We'll come back to the problem of determining a good estimator from first principles.
+
+A shortcoming of a *point estimator* is that is doesn't suggest how far wrong it might be.
+
+\pause A better option is to provide a pair of estimators $\hat\theta_L$ and $\hat\theta_U$ that satisfy the following equation:
+$$P\left(\hat\theta_L < \theta < \hat\theta_U\right) = 1 - \alpha$$
+for some pre-determined $\alpha$.
+
+\pause $\alpha$ can be anything between 0 and 1, but is typically chosen to be small.
+
+\pause $\alpha$ is arbitrary. There is no "correct" or "better" $\alpha$ value. By far and away the most common choice is $\alpha=0.05$. 
+
+\pause The interval $\left[\hat\theta_L, \hat\theta_U\right]$ is called a $(1-\alpha)\cdot 100\%$ \textit{confidence inteval} for $\theta$.
+
+\pause It is possible to have $\hat\theta_L = -\infty$ or $\hat\theta_U = \infty$
+
+When $\alpha = 0.05$ (as usual), we have a 95\% confidence interval.
+
+## (artifical) example of a confidence interval
+
+Suppose the underlying population is $N(\mu, \sigma_0)$ with $\sigma_0$ (magically) known. 
+
+We plan to gather a sample $X_1,\ldots,X_n$. There are *lots* of 95\% confidence intervals for $\mu$, obtained by isolating $\mu$ in the middle of:
+$$P\left(a < \frac{\ol{X} - \mu}{\sigma_0/\sqrt{n}} < b\right) = 1 - \alpha$$
+
+\pause Define $z_\alpha$ as the solution of $P(Z \le z_\alpha) = 1-\alpha$, where $Z \sim N(0,1)$. The *shortest possible * 95\% confidence interval for $\mu$ comes from:
+$$P\left(\ol{X} - z_{0.025}\frac{\sigma_0}{\sqrt{n}} <  \mu < \ol{X} + z_{0.025}\frac{\sigma_0}{\sqrt{n}}\right) = 0.95$$
+
+## a near-universal 95\% C.I. formula
+
+\pause Note that $z_{0.025} = 1.96$.
+
+Also, the standard deviation of $\ol{X}$ is $\frac{\sigma_0}{\sqrt{n}}$
+
+\pause A synonym for the phrase "standard deviation of the estimator" is \textit{standard error}, abbreviated: s.e.
+
+\pause Neil's patented universal 95\% C.I. formula is:
+$$\text{estimator} \pm \text{``}2\text{''} \text{s.e.(estimator)}$$
+
+\pause "Two" is in quotation marks because the precise value will vary a little over and under 2, but it will always be close to 2 (for a 95\% interval).
+
+## meaning, and some myths
+
+A confidence interval is a statement about the "plan" to gather a sample. 
+
+\pause C.I. meaning: The "plan" will result in an interval that will capture the true parameter with probability $1 - \alpha$.
+
+\pause Once the dataset is collected, and the numbers plugged into the suitable C.I. formula, that is a realization of the C.I. formula.
+
+\pause Most common myth goes like this. The dataset is collected, and the 95\% confidence interval for $\mu$ is, say [4.2, 6.8]. 
+
+\begin{quote}There is a 95\% chance that $\mu$ is between 4.2 and 6.8.
+\end{quote}
+
+\pause The statement is nonsense. Either $\mu$ is between 4.2 and 6.8, or it isn't.
+
+## things that affect the width of a typical C.I.
+
+The (artificial) example is nevertheless characteristic:
+$$\ol{X} \pm z_{\alpha/2}\frac{\sigma_0}{\sqrt{n}}$$
+
+\pause The larger the $\sigma_0$, the wider the C.I. (But you have no control over $\sigma_0$.)
+
+\pause The larger the $\alpha$, the narrower the C.I. (But $\alpha$ is arbitrary.)
+
+\pause The larger the $n$, the narrower the C.I. (The sample size *is* under your control.)
+
+## a sample size calculation
+
+The *(absolute) margin of error* $e$ is half the width of a confidence interval.
+
+\pause In the current (artificial) situation, to produce a $(1-\alpha)\cdot 100\%$ confidence interval of width $2e$, the sample size needs to be:
+$$n = \left(\frac{z_{\alpha/2}\sigma_0}{e}\right)^2$$
+
+\pause This won't usually be an interger, so to drive students crazy I say "pick one of the two sample sizes adjacent", because it really doesn't matter.
+
+\pause In reality $\sigma$ is not known. There are a few practical options:
+
+* collect a "pilot sample" of some moderate size (30 to 50, say), to get an estimate of $\sigma$.
+
+* use prior knowledge of the value of $\sigma$
+
+* if the population is plausibly normal, use prior knowledge of the minimum $m$  and maximum $M$ plausible values you might ever see, and use $(M-m)/6$ as a rough guesstimate for $\sigma$.
+
+## the classic "one-sample" $t$ interval - I
+
+A more realistic situation is that the population is $N(\mu, \sigma)$, both parameters unknown, although the mean is of primary interest. We plan to get a sample $X_1,\ldots,X_n$.
+
+\pause The (artificial) interval was based on:
+$$\frac{\ol{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)$$
+\pause We'll do this often---replace $\sigma$ with $S$---to obtain:
+$$\frac{\ol{X} - \mu}{S/\sqrt{n}} \sim t_{n-1}$$
+
+\pause Define $t_{n-1,\alpha}$ as the solution of $P(t_{n-1} \le t_{n-1,\alpha}) = 1-\alpha$. The new interval will be based on:
+$$P\left(-t_{n-1,\alpha/2} < \frac{\ol{X} - \mu}{S/\sqrt{n}} < t_{n-1,\alpha/2}\right) = 1 - \alpha$$
+
+## the classic "one-sample" $t$ interval - II
+
+The interval is therefore:
+$$\ol{X} \pm t_{n-1,\alpha/2}\frac{S}{\sqrt{n}}$$
+
+\pause The value $\frac{S}{\sqrt{n}}$ is (also) called the (estimated) standard error for $\ol{X}$, or $\text{s.e.}(\ol{X})$, and we end up with another example of the universal formula:
+$$\text{estimator} \pm \text{``}2\text{''} \text{s.e.(estimator)}$$
+(patent pending) for any non-insane sample size.
+
+\pause That's because $t$ calculations aren't wildly different from $N(0,1)$ calculations as long as $n-1$ isn't tiny.
+
+## $t_{n-1, 0.025}$ for some non-insane sample sizes
+
+```{r}
+library(knitr)
+n=c(15, 30, 40, 50, 60, 150)
+kable(data.frame(n=n, t = -qt(0.025,n)))
+```
+
+## example
+
+Examples themselves tend to be as interesting as watching paint dry.
+
+\pause So, for example, consider textbook question 9.14, which gives 15 values for the drying time, in hours, of a brand of latex paint.
+
+```{r}
+library(tidyverse)
+paint <- read.csv("Ex09.14.txt")
+paint %>% 
+  summarize(x_bar=mean(latex.paint), s=sd(latex.paint), n=n()) %>% 
+  kable
+```
+
+
+\pause The 95% confidence interval for the mean drying time is:
+
+```{r}
+library(broom)
+paint_fit <- t.test(paint$latex.paint)
+glance(paint_fit) %>% 
+  select(conf.low, conf.high) %>% 
+  kable
+```
+
+

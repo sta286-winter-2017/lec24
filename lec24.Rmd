@@ -135,7 +135,7 @@ $$P\left(-t_{n-1,\alpha/2} < \frac{\ol{X} - \mu}{S/\sqrt{n}} < t_{n-1,\alpha/2}\
 The interval is therefore:
 $$\ol{X} \pm t_{n-1,\alpha/2}\frac{S}{\sqrt{n}}$$
 
-\pause The value $\frac{S}{\sqrt{n}}$ is (also) called the (estimated) standard error for $\ol{X}$, or $\text{s.e.}(\ol{X})$, and we end up with another example of the universal formula:
+\pause The value $\frac{S}{\sqrt{n}}$ is (also) called the (estimated) standard error for $\ol{X}$, or $\text{s.e.}(\ol{X})$, and in the usual 95\% case we end up with another example of the universal formula:
 $$\text{estimator} \pm \text{``}2\text{''} \text{s.e.(estimator)}$$
 (patent pending) for any non-insane sample size.
 
